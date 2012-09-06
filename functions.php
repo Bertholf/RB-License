@@ -37,7 +37,7 @@
 		function rb_license_add_dashboard() {
 			global $wp_meta_boxes;
 			// Create Dashboard Widgets
-			wp_add_dashboard_widget('rb_license_dashboard_quicklinks', __("RB Blank Updates", rb_license_TEXTDOMAIN), 'rb_license_dashboard_quicklinks');
+			wp_add_dashboard_widget('rb_license_dashboard_quicklinks', __("RB License Updates", rb_license_TEXTDOMAIN), 'rb_license_dashboard_quicklinks');
 		
 			// reorder the boxes - first save the left and right columns into variables
 			$left_dashboard = $wp_meta_boxes['dashboard']['normal']['core'];

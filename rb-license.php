@@ -1,6 +1,6 @@
 <?php 
 /*
-  Plugin Name: RB LICENSE
+  Plugin Name: RB License
   Plugin URI: http://rbplugin.com/wordpress/license/
   Description: A license plugin for WordPress.
   Author: Rob Bertholf, rob@bertholf.com
@@ -177,7 +177,7 @@ $rb_license_VERSION = "0.1";
 			function rb_license_addsettingspage() {
 				if ( !current_user_can('update_core') )
 					return;
-				$pagehook = add_management_page( __("Manage Blanks", rb_license_TEXTDOMAIN), __("Blanks", rb_license_TEXTDOMAIN), 'update_core', rb_license_BASENAME, 'rb_license_menu_settings', '' );
+				$pagehook = add_management_page( __("Manage Licenses", rb_license_TEXTDOMAIN), __("Licenses", rb_license_TEXTDOMAIN), 'update_core', rb_license_BASENAME, 'rb_license_menu_settings', '' );
 				add_action( 'load-plugins.php', 'rb_license_on_load' );
 			}
 
@@ -188,7 +188,7 @@ $rb_license_VERSION = "0.1";
 		add_action('admin_menu','set_rb_license_menu');
 			//Create Admin Menu
 			function set_rb_license_menu(){
-				add_menu_page( __("Blank Plugin", rb_license_TEXTDOMAIN), __("Blank Plugin", rb_license_TEXTDOMAIN), 1,"rb_license_menu","rb_license_menu_dashboard","div");
+				add_menu_page( __("License Manager", rb_license_TEXTDOMAIN), __("License Plugin", rb_license_TEXTDOMAIN), 1,"rb_license_menu","rb_license_menu_dashboard","div");
 				add_submenu_page("rb_license_menu", __("Overview", rb_license_TEXTDOMAIN), __("Overview", rb_license_TEXTDOMAIN), 1,"rb_license_menu", "rb_license_menu_dashboard");
 				add_submenu_page("rb_license_menu", __("Manage Licenses", rb_license_TEXTDOMAIN), __("License", rb_license_TEXTDOMAIN), 7,"rb_license_license","rb_license_menu_license");
 				add_submenu_page("rb_license_menu", __("Edit Settings", rb_license_TEXTDOMAIN), __("Settings", rb_license_TEXTDOMAIN), 7,"rb_license_settings","rb_license_menu_settings");
@@ -294,7 +294,7 @@ $rb_license_VERSION = "0.1";
 		// Setup
 		function rb_license_widget_detail() {
 			$widget_ops = array('classname' => 'rb_license_widget_detail', 'description' => __("Displays record detail", rb_license_TEXTDOMAIN) );
-			$this->WP_Widget('rb_license_widget_detail', __("RB Blank Detail", rb_license_TEXTDOMAIN), $widget_ops);
+			$this->WP_Widget('rb_license_widget_detail', __("RB License Detail", rb_license_TEXTDOMAIN), $widget_ops);
 		}
 	
 		// What Displays
