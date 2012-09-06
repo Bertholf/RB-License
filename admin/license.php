@@ -39,7 +39,7 @@ if (isset($_POST['action'])) {
 			// Create Record
 			$insert = "INSERT INTO " . table_license_license .
 				" (LicenseTitle, LicenseVersion, LicenseText, LicenseType, LicenseURL, LicenseClientName, LicenseClientEmail, LicenseDateUpdated, LicenseActive)" .
-				"VALUES ('" . $wpdb->escape($LicenseTitle) . "','" . $wpdb->escape($LicenseVersion) . "','" . $wpdb->escape($LicenseText) . "','" . $wpdb->escape($LicenseType) . "','" . $wpdb->escape($LicenseURL) . "','" . $wpdb->escape($LicenseName) . "','" . $wpdb->escape($LicenseEmail) . "','" . $wpdb->escape($LicenseDateUpdated) . "','" . $wpdb->escape($LicenseActive) . "')";
+				"VALUES ('" . $wpdb->escape($LicenseTitle) . "','" . $wpdb->escape($LicenseVersion) . "','" . $wpdb->escape($LicenseText) . "','" . $wpdb->escape($LicenseType) . "','" . $wpdb->escape($LicenseURL) . "','" . $wpdb->escape($LicenseClientName) . "','" . $wpdb->escape($LicenseClientEmail) . "','" . $wpdb->escape($LicenseDateUpdated) . "','" . $wpdb->escape($LicenseActive) . "')";
 		    $results = $wpdb->query($insert);
 			$LicenseAutoID = $wpdb->insert_id;
 
@@ -284,7 +284,7 @@ function rb_display_list() {
             $sort = $_GET['sort'];
         }
         else {
-            $sort = "LicenseDateCreated";
+            $sort = "l.LicenseDateCreated";
         }
 		
 		// Sort Order
@@ -306,10 +306,11 @@ function rb_display_list() {
 		echo "<thead>\n";
 		echo "    <tr class=\"thead\">\n";
 		echo "        <th class=\"manage-column column cb check-column\" id=\"cb\" scope=\"col\"><input type=\"checkbox\"/></th>\n";
-		echo "        <th class=\"column\" scope=\"col\"><a href=\"admin.php?page=". $_GET['page'] ."&sort=LicenseTitle&dir=". $sortDirection ."\">". __("Client", rb_license_TEXTDOMAIN) ."</a></th>\n";
-		echo "        <th class=\"column\" scope=\"col\"><a href=\"admin.php?page=". $_GET['page'] ."&sort=LicenseURL&dir=". $sortDirection ."\">". __("URL", rb_license_TEXTDOMAIN) ."</a></th>\n";
-		echo "        <th class=\"column\" scope=\"col\"><a href=\"admin.php?page=". $_GET['page'] ."&sort=LicenseName&dir=". $sortDirection ."\">". __("Name", rb_license_TEXTDOMAIN) ."</a></th>\n";
-		echo "        <th class=\"column\" scope=\"col\"><a href=\"admin.php?page=". $_GET['page'] ."&sort=LicenseActive&dir=". $sortDirection ."\">". __("Active", rb_license_TEXTDOMAIN) ."</a></th>\n";
+		echo "        <th class=\"column\" scope=\"col\"><a href=\"admin.php?page=". $_GET['page'] ."&sort=l.LicenseTitle&dir=". $sortDirection ."\">". __("Client", rb_license_TEXTDOMAIN) ."</a></th>\n";
+		echo "        <th class=\"column\" scope=\"col\"><a href=\"admin.php?page=". $_GET['page'] ."&sort=l.LicenseURL&dir=". $sortDirection ."\">". __("URL", rb_license_TEXTDOMAIN) ."</a></th>\n";
+		echo "        <th class=\"column\" scope=\"col\"><a href=\"admin.php?page=". $_GET['page'] ."&sort=l.LicenseName&dir=". $sortDirection ."\">". __("Name", rb_license_TEXTDOMAIN) ."</a></th>\n";
+		echo "        <th class=\"column\" scope=\"col\"><a href=\"admin.php?page=". $_GET['page'] ."&sort=l.LicenseType&dir=". $sortDirection ."\">". __("Product", rb_license_TEXTDOMAIN) ."</a></th>\n";
+		echo "        <th class=\"column\" scope=\"col\"><a href=\"admin.php?page=". $_GET['page'] ."&sort=l.LicenseVersion&dir=". $sortDirection ."\">". __("Version", rb_license_TEXTDOMAIN) ."</a></th>\n";
 		echo "    </tr>\n";
 		echo "</thead>\n";
 		echo "<tfoot>\n";
@@ -318,12 +319,13 @@ function rb_display_list() {
 		echo "        <th class=\"column\" scope=\"col\">". __("Client", rb_license_TEXTDOMAIN) ."</th>\n";
 		echo "        <th class=\"column\" scope=\"col\">". __("URL", rb_license_TEXTDOMAIN) ."</th>\n";
 		echo "        <th class=\"column\" scope=\"col\">". __("Name", rb_license_TEXTDOMAIN) ."</th>\n";
-		echo "        <th class=\"column\" scope=\"col\">". __("Active", rb_license_TEXTDOMAIN) ."</th>\n";
+		echo "        <th class=\"column\" scope=\"col\">". __("Product", rb_license_TEXTDOMAIN) ."</th>\n";
+		echo "        <th class=\"column\" scope=\"col\">". __("Version", rb_license_TEXTDOMAIN) ."</th>\n";
 		echo "    </tr>\n";
 		echo "</tfoot>\n";
 		echo "<tbody>\n";
 		
-        $query = "SELECT * FROM ". table_license_license ." $filter ORDER BY $sort $dir";
+        $query = "SELECT l.*, (SELECT t.ProductTitle FROM ". table_license_product ." t WHERE t.ProductID = l.LicenseType) AS ProductTitle FROM ". table_license_license ." l $filter ORDER BY $sort $dir";
         $results = mysql_query($query);
         $count = mysql_num_rows($results);
 		
@@ -342,6 +344,7 @@ function rb_display_list() {
 		echo "        </td>\n";
 		echo "        <td class=\"column\">". stripslashes($data['LicenseURL']) ."</td>\n";
 		echo "        <td class=\"column\"><a href='mailto:". stripslashes($data['LicenseClientEmail']) ."'>". stripslashes($data['LicenseClientName']) ."</a></td>\n";
+		echo "        <td class=\"column\">". stripslashes($data['ProductTitle']) ."</td>\n";
 		echo "        <td class=\"column\">". stripslashes($data['LicenseVersion']) ."</td>\n";
 		echo "    </tr>\n";
         }
@@ -350,12 +353,12 @@ function rb_display_list() {
 			if (isset($filter)) { 
 	echo "    <tr>\n";
 	echo "        <td class=\"check-column\" scope=\"row\"></th>\n";
-	echo "        <td class=\"column\" colspan=\"4\"><p>". __("No ". LabelPlural ." found with this criteria", rb_license_TEXTDOMAIN) . ".</p></td>\n";
+	echo "        <td class=\"column\" colspan=\"5\"><p>". __("No ". LabelPlural ." found with this criteria", rb_license_TEXTDOMAIN) . ".</p></td>\n";
 	echo "    </tr>\n";
 			} else {
 	echo "    <tr>\n";
 	echo "        <td class=\"check-column\" scope=\"row\"></th>\n";
-	echo "        <td class=\"column\" colspan=\"4\"><p>". __("There aren't any ". LabelPlural ." loaded yet", rb_license_TEXTDOMAIN) . "!</p></td>\n";
+	echo "        <td class=\"column\" colspan=\"5\"><p>". __("There aren't any ". LabelPlural ." loaded yet", rb_license_TEXTDOMAIN) . "!</p></td>\n";
 	echo "    </tr>\n";
 			}
         } 
