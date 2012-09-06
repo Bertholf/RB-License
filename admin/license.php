@@ -38,8 +38,8 @@ if (isset($_POST['action'])) {
 
 			// Create Record
 			$insert = "INSERT INTO " . table_license_license .
-				" (LicenseTitle, LicenseVersion, LicenseText, LicenseType, LicenseURL, LicenseDateUpdated, LicenseActive)" .
-				"VALUES ('" . $wpdb->escape($LicenseTitle) . "','" . $wpdb->escape($LicenseVersion) . "','" . $wpdb->escape($LicenseText) . "','" . $wpdb->escape($LicenseType) . "','" . $wpdb->escape($LicenseURL) . "','" . $wpdb->escape($LicenseDateUpdated) . "','" . $wpdb->escape($LicenseActive) . "')";
+				" (LicenseTitle, LicenseVersion, LicenseText, LicenseType, LicenseURL, LicenseClientName, LicenseClientEmail, LicenseDateUpdated, LicenseActive)" .
+				"VALUES ('" . $wpdb->escape($LicenseTitle) . "','" . $wpdb->escape($LicenseVersion) . "','" . $wpdb->escape($LicenseText) . "','" . $wpdb->escape($LicenseType) . "','" . $wpdb->escape($LicenseURL) . "','" . $wpdb->escape($LicenseName) . "','" . $wpdb->escape($LicenseEmail) . "','" . $wpdb->escape($LicenseDateUpdated) . "','" . $wpdb->escape($LicenseActive) . "')";
 		    $results = $wpdb->query($insert);
 			$LicenseAutoID = $wpdb->insert_id;
 
@@ -62,6 +62,8 @@ if (isset($_POST['action'])) {
 				LicenseText='" . $wpdb->escape($LicenseText) . "',
 				LicenseType='" . $wpdb->escape($LicenseType) . "',
 				LicenseURL='" . $wpdb->escape($LicenseURL) . "',
+				LicenseClientName='" . $wpdb->escape($LicenseClientName) . "',
+				LicenseClientEmail='" . $wpdb->escape($LicenseClientEmail) . "',
 				LicenseDateCreated='" . $wpdb->escape($LicenseDateCreated) . "',
 				LicenseDateUpdated='" . $wpdb->escape($LicenseDateUpdated) . "',
 				LicenseActive='" . $wpdb->escape($LicenseActive) . "'
@@ -147,10 +149,12 @@ function rb_display_manage($LicenseAutoID) {
 	while ($data = mysql_fetch_array($results)) {
 		$LicenseAutoID		= $data['LicenseAutoID'];
 		$LicenseTitle		= stripslashes($data['LicenseTitle']);
-		$LicenseVersion		= stripslashes($data['LicenseTitle']);
+		$LicenseVersion		= stripslashes($data['LicenseVersion']);
 		$LicenseText		= stripslashes($data['LicenseText']);
 		$LicenseType		= $data['LicenseType'];
-		$LicenseURL		= $data['LicenseURL'];
+		$LicenseURL			= $data['LicenseURL'];
+		$LicenseClientName	= $data['LicenseClientName'];
+		$LicenseClientEmail	= $data['LicenseClientEmail'];
 		$LicenseDateCreated	= $data['LicenseDateCreated'];
 		$LicenseDateUpdated = $data['LicenseDateUpdated'];
 		$LicenseActive		= $data['LicenseActive'];
@@ -188,19 +192,27 @@ function rb_display_manage($LicenseAutoID) {
 	echo "        <td><textarea id=\"LicenseText\" name=\"LicenseText\" class=\"rbformitem rbformtextarea\">". $LicenseText ."</textarea></td>\n";
 	echo "    </tr>\n";
 	echo "    <tr valign=\"top\">\n";
-	echo "        <th scope=\"row\" class=\"rblabel\">". __("Price", rb_license_TEXTDOMAIN) .":</th>\n";
+	echo "        <th scope=\"row\" class=\"rblabel\">". __("Authorized URL", rb_license_TEXTDOMAIN) .":</th>\n";
 	echo "        <td><input type=\"text\" id=\"LicenseURL\" name=\"LicenseURL\" value=\"". $LicenseURL ."\" class=\"rbformitem rbformtext\" /></td>\n";
+	echo "    </tr>\n";
+	echo "    <tr valign=\"top\">\n";
+	echo "        <th scope=\"row\" class=\"rblabel\">". __("Client Name", rb_license_TEXTDOMAIN) .":</th>\n";
+	echo "        <td><input type=\"text\" id=\"LicenseClientName\" name=\"LicenseClientName\" value=\"". $LicenseClientName ."\" class=\"rbformitem rbformtext\" /></td>\n";
+	echo "    </tr>\n";
+	echo "    <tr valign=\"top\">\n";
+	echo "        <th scope=\"row\" class=\"rblabel\">". __("Client Email", rb_license_TEXTDOMAIN) .":</th>\n";
+	echo "        <td><input type=\"text\" id=\"LicenseClientEmail\" name=\"LicenseClientEmail\" value=\"". $LicenseClientEmail ."\" class=\"rbformitem rbformtext\" /></td>\n";
 	echo "    </tr>\n";
 	/*
 	echo "    <tr valign=\"top\">\n";
 	echo "        <th scope=\"row\" class=\"rblabel\">". __("Date Created", rb_license_TEXTDOMAIN) .":</th>\n";
 	echo "        <td><input type=\"text\" id=\"LicenseDateCreated\" name=\"LicenseDateCreated\" value=\"". $LicenseDateCreated ."\" class=\"rbformitem rbformtext\" /></td>\n";
 	echo "    </tr>\n";
+	*/
 	echo "    <tr valign=\"top\">\n";
-	echo "        <th scope=\"row\" class=\"rblabel\">". __("Date Updated", rb_license_TEXTDOMAIN) .":</th>\n";
+	echo "        <th scope=\"row\" class=\"rblabel\">". __("Date Upgraded", rb_license_TEXTDOMAIN) .":</th>\n";
 	echo "        <td><input type=\"text\" id=\"LicenseDateUpdated\" name=\"LicenseDateUpdated\" value=\"". $LicenseDateUpdated ."\" class=\"rbformitem rbformtext\" /></td>\n";
 	echo "    </tr>\n";
-	*/
 	echo "    <tr valign=\"top\">\n";
 	echo "        <th scope=\"row\" class=\"rblabel\">". __("Type", rb_license_TEXTDOMAIN) .":</th>\n";
 	echo "        <td><select name=\"LicenseType\" id=\"LicenseType\" class=\"rbformitem rbformselect\">\n";
@@ -294,14 +306,18 @@ function rb_display_list() {
 		echo "<thead>\n";
 		echo "    <tr class=\"thead\">\n";
 		echo "        <th class=\"manage-column column cb check-column\" id=\"cb\" scope=\"col\"><input type=\"checkbox\"/></th>\n";
-		echo "        <th class=\"column\" scope=\"col\"><a href=\"admin.php?page=". $_GET['page'] ."&sort=LicenseTitle&dir=". $sortDirection ."\">". __("Title", rb_license_TEXTDOMAIN) ."</a></th>\n";
+		echo "        <th class=\"column\" scope=\"col\"><a href=\"admin.php?page=". $_GET['page'] ."&sort=LicenseTitle&dir=". $sortDirection ."\">". __("Client", rb_license_TEXTDOMAIN) ."</a></th>\n";
+		echo "        <th class=\"column\" scope=\"col\"><a href=\"admin.php?page=". $_GET['page'] ."&sort=LicenseURL&dir=". $sortDirection ."\">". __("URL", rb_license_TEXTDOMAIN) ."</a></th>\n";
+		echo "        <th class=\"column\" scope=\"col\"><a href=\"admin.php?page=". $_GET['page'] ."&sort=LicenseName&dir=". $sortDirection ."\">". __("Name", rb_license_TEXTDOMAIN) ."</a></th>\n";
 		echo "        <th class=\"column\" scope=\"col\"><a href=\"admin.php?page=". $_GET['page'] ."&sort=LicenseActive&dir=". $sortDirection ."\">". __("Active", rb_license_TEXTDOMAIN) ."</a></th>\n";
 		echo "    </tr>\n";
 		echo "</thead>\n";
 		echo "<tfoot>\n";
 		echo "    <tr class=\"thead\">\n";
 		echo "        <th class=\" columnmanage-column cb check-column\" id=\"cb\" scope=\"col\"><input type=\"checkbox\"/></th>\n";
-		echo "        <th class=\"column\" scope=\"col\">". __("Title", rb_license_TEXTDOMAIN) ."</th>\n";
+		echo "        <th class=\"column\" scope=\"col\">". __("Client", rb_license_TEXTDOMAIN) ."</th>\n";
+		echo "        <th class=\"column\" scope=\"col\">". __("URL", rb_license_TEXTDOMAIN) ."</th>\n";
+		echo "        <th class=\"column\" scope=\"col\">". __("Name", rb_license_TEXTDOMAIN) ."</th>\n";
 		echo "        <th class=\"column\" scope=\"col\">". __("Active", rb_license_TEXTDOMAIN) ."</th>\n";
 		echo "    </tr>\n";
 		echo "</tfoot>\n";
@@ -324,7 +340,9 @@ function rb_display_list() {
 		echo "            <span class=\"delete\"><a class=\"submitdelete\" href=\"". admin_url("admin.php?page=". $_GET['page']) ."&amp;action=deleteRecord&amp;LicenseAutoID=". $LicenseAutoID ."\"  onclick=\"if ( confirm('". __("You are about to delete this ". LabelSingular, rb_license_TEXTDOMAIN) . ".\'". __("Cancel", rb_license_TEXTDOMAIN) . "\' ". __("to stop", rb_license_TEXTDOMAIN) . ", \'". __("OK", rb_license_TEXTDOMAIN) . "\' ". __("to delete", rb_license_TEXTDOMAIN) . ".') ) { return true;}return false;\" title=\"". __("Delete this Record", rb_license_TEXTDOMAIN) . "\">". __("Delete", rb_license_TEXTDOMAIN) . "</a> </span>\n";
 		echo "          </div>\n";
 		echo "        </td>\n";
-		echo "        <td class=\"column\">". stripslashes($data['LicenseActive']) ."</td>\n";
+		echo "        <td class=\"column\">". stripslashes($data['LicenseURL']) ."</td>\n";
+		echo "        <td class=\"column\"><a href='mailto:". stripslashes($data['LicenseClientEmail']) ."'>". stripslashes($data['LicenseClientName']) ."</a></td>\n";
+		echo "        <td class=\"column\">". stripslashes($data['LicenseVersion']) ."</td>\n";
 		echo "    </tr>\n";
         }
 		mysql_free_result($results);
@@ -332,12 +350,12 @@ function rb_display_list() {
 			if (isset($filter)) { 
 	echo "    <tr>\n";
 	echo "        <td class=\"check-column\" scope=\"row\"></th>\n";
-	echo "        <td class=\"column\" colspan=\"2\"><p>". __("No ". LabelPlural ." found with this criteria", rb_license_TEXTDOMAIN) . ".</p></td>\n";
+	echo "        <td class=\"column\" colspan=\"4\"><p>". __("No ". LabelPlural ." found with this criteria", rb_license_TEXTDOMAIN) . ".</p></td>\n";
 	echo "    </tr>\n";
 			} else {
 	echo "    <tr>\n";
 	echo "        <td class=\"check-column\" scope=\"row\"></th>\n";
-	echo "        <td class=\"column\" colspan=\"2\"><p>". __("There aren't any ". LabelPlural ." loaded yet", rb_license_TEXTDOMAIN) . "!</p></td>\n";
+	echo "        <td class=\"column\" colspan=\"4\"><p>". __("There aren't any ". LabelPlural ." loaded yet", rb_license_TEXTDOMAIN) . "!</p></td>\n";
 	echo "    </tr>\n";
 			}
         } 
