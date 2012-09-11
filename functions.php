@@ -94,7 +94,7 @@
 	add_filter("body_class", "rb_license_insertbodyclass");
 	add_filter("post_class", "rb_license_insertbodyclass");
 		function rb_license_insertbodyclass($classes) {
-			if (substr($_SERVER['REQUEST_URI'], 0, len("/test/")) == "/test/") {
+			if (substr($_SERVER['REQUEST_URI'], 0, strlen("/test/")) == "/test/") {
 				$classes[] = 'rb-license-test';
 			} else {
 				$classes[] = 'rb-license';
@@ -115,6 +115,10 @@
 			$newrules['license-category/([0-9])$'] = 'index.php?type=category&paging=$matches[1]';
 			// Base
 			$newrules['license-category/(.*)$'] = 'index.php?type=category&target=$matches[1]';
+			//Ping
+			$newrules['rb-license-checklist'] = 'index.php?type=checklist';
+			// Ping Main core
+			$newrules['rb-latest-plugin'] = 'index.php?type=checklatestupdate';
 			return $newrules + $rules;
 		}
 		
@@ -136,6 +140,10 @@
 				return dirname(__FILE__) . '/theme/view-search.php'; 
 			  } elseif (get_query_var( 'type' ) == "print") {
 				return dirname(__FILE__) . '/theme/view-print.php'; 
+			  }elseif (get_query_var( 'type' ) == "checklist") {
+				return dirname(__FILE__) . '/pingbox/view-ping.php'; 
+			  }elseif (get_query_var( 'type' ) == "checklatestupdate") {
+				return dirname(__FILE__) . '/pingbox/view-latest-version.php'; 
 			  }
 			}
 			return $template;
