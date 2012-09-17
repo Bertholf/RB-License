@@ -136,9 +136,7 @@
 	add_filter('template_include', 'rb_license_template_include', 1, 1); 
 		function rb_license_template_include( $template ) {
 			if ( get_query_var( 'type' ) ) {
-			  if (get_query_var( 'type' ) == "search") {
-				return dirname(__FILE__) . '/theme/view-search.php'; 
-			  } elseif (get_query_var( 'type' ) == "print") {
+			  if (get_query_var( 'type' ) == "print") {
 				return dirname(__FILE__) . '/theme/view-print.php'; 
 			  }elseif (get_query_var( 'type' ) == "checklist") {
 				return dirname(__FILE__) . '/pingbox/view-ping.php'; 
